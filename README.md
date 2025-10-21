@@ -1,9 +1,9 @@
 # 🎬 Cinema Test Automation Challenge
 
 ## 👨‍💻 Sobre o Autor
-**Nome:** [Seu Nome]  
-**Curso:** Automação de Testes  
-**Instituição:** UOL  
+**Nome:** Eric Bauer  
+**Challenge Final**  
+**Compass UOL**  
 
 ## 📋 Descrição do Projeto
 Projeto de automação de testes para aplicação de cinema desenvolvido como challenge final do curso de automação de testes. O projeto abrange testes de API e interface web utilizando Robot Framework.
@@ -35,7 +35,7 @@ challenge_final-uol/
 ## ⚙️ Instalação
 ```bash
 # Clonar o repositório
-git clone [url-do-repositorio]
+git clone https://github.com/mullerbau/cinemaAPI-challenge
 
 # Instalar dependências
 pip install -r requirements.txt
