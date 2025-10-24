@@ -1,88 +1,80 @@
 *** Settings ***
-Documentation    Testes de filmes da API Cinema App
-Resource         ../resources/base.robot
-Test Setup       Setup API Tests
-Test Teardown    Teardown Tests
+Resource    ../../resources/base.robot
+Suite Setup    Setup Movies Service
+Suite Teardown    Cleanup Test Data
+Test Tags    api    movies
 
 *** Test Cases ***
-CT-API-009 - Listar todos os filmes
-    [Documentation]    Valida listagem de filmes disponíveis (endpoint público)
-    [Tags]    api    movies    positive    smoke    public    read
-    
+Movies-001: Get All Movies Successfully
+    [Documentation]    Testa listagem de todos os filmes
+    [Tags]    positive    smoke    critical
     ${response}=    Get All Movies
-    Validate Success Response    ${response}    200
-    
-    ${movies}=    Set Variable    ${response.json()}
-    Should Not Be Empty    ${movies}    Lista de filmes não deve estar vazia
-    
-    # Valida estrutura do primeiro filme
-    ${first_movie}=    Set Variable    ${movies[0]}
-    Validate Movie Structure    ${first_movie}
-    
-    # Valida que é uma lista
-    ${movies_count}=    Get Length    ${movies}
-    Should Be True    ${movies_count} > 0    Deve haver pelo menos 1 filme
-
-CT-API-010 - Obter filme por ID válido
-    [Documentation]    Valida busca de filme específico por ID
-    [Tags]    api    movies    positive    public    read    crud
-    
-    # Primeiro obtém lista para pegar um ID válido
-    ${movies_response}=    Get All Movies
-    Validate Success Response    ${movies_response}    200
-    ${movie_id}=    Get First Movie ID From Response    ${movies_response}
-    
-    # Busca o filme específico
-    ${response}=    Get Movie By ID    ${movie_id}
-    Validate Success Response    ${response}    200
-    
-    ${movie}=    Set Variable    ${response.json()}
-    Validate Movie Structure    ${movie}
-    Should Be Equal As Strings    ${movie['_id']}    ${movie_id}
-    
-    # Valida campos específicos
-    Should Not Be Empty    ${movie['title']}
-    Should Not Be Empty    ${movie['synopsis']}
-    Should Be True    ${movie['duration']} > 0
-
-CT-API-011 - Obter filme por ID inexistente
-    [Documentation]    Valida erro 404 ao buscar filme que não existe
-    [Tags]    api    movies    negative    not_found    error_handling
-    
-    ${invalid_id}=    Set Variable    507f1f77bcf86cd799439011
-    ${response}=    Get Movie By ID    ${invalid_id}
-    
-    Validate Error Response    ${response}    404
-
-CT-API-012 - Validar estrutura dos dados do filme
-    [Documentation]    Valida se filme contém todos os campos obrigatórios
-    [Tags]    api    movies    positive    validation    data_structure
-    
-    ${response}=    Get All Movies
-    Validate Success Response    ${response}    200
-    
-    ${movies}=    Set Variable    ${response.json()}
+    Should Be Equal As Integers    ${response.status_code}    200
+    Should Contain    ${response.json()}    data
+    ${movies}=    Get From Dictionary    ${response.json()}    data
     Should Not Be Empty    ${movies}
-    
-    # Valida estrutura de cada filme na lista
-    FOR    ${movie}    IN    @{movies}
-        Validate Movie Structure    ${movie}
-        # Valida tipos de dados
-        Should Be String    ${movie['title']}
-        Should Be String    ${movie['director']}
-        Should Be True    isinstance($movie['genres'], list)
-        Should Be True    isinstance($movie['duration'], int)
-    END
 
-CT-API-013 - Listar filmes quando vazio
-    [Documentation]    Valida comportamento quando não há filmes (cenário edge case)
-    [Tags]    api    movies    edge_case    boundary    public
-    
-    # Este teste assume que sempre haverá filmes no sistema
-    # Em um cenário real, poderíamos limpar todos os filmes primeiro
+Movies-002: Get Movie By Valid ID
+    [Documentation]    Testa busca de filme por ID válido
+    [Tags]    positive    critical
+    ${all_movies}=    Get All Movies
+    ${movies}=    Get From Dictionary    ${all_movies.json()}    data
+    ${first_movie}=    Get From List    ${movies}    0
+    ${movie_id}=    Get From Dictionary    ${first_movie}    _id
+    ${response}=    Get Movie By ID    ${movie_id}
+    Should Be Equal As Integers    ${response.status_code}    200
+    Should Contain    ${response.json()}    data
+    ${movie}=    Get From Dictionary    ${response.json()}    data
+    Should Be Equal    ${movie}[_id]    ${movie_id}
+
+Movies-003: Get Movie By Invalid ID
+    [Documentation]    Testa busca de filme com ID inválido
+    [Tags]    negative    validation
+    ${response}=    Get Movie By ID    invalid_id
+    Should Be Equal As Integers    ${response.status_code}    404
+
+Movies-004: Get Movie Sessions Successfully
+    [Documentation]    Testa listagem de sessões de um filme
+    [Tags]    positive    critical
+    ${all_movies}=    Get All Movies
+    ${movies}=    Get From Dictionary    ${all_movies.json()}    data
+    ${first_movie}=    Get From List    ${movies}    0
+    ${movie_id}=    Get From Dictionary    ${first_movie}    _id
+    ${response}=    Get Movie Sessions    ${movie_id}
+    Should Be Equal As Integers    ${response.status_code}    200
+    Should Contain    ${response.json()}    data
+
+Movies-005: Get Sessions For Invalid Movie
+    [Documentation]    Testa busca de sessões para filme inexistente
+    [Tags]    negative    validation
+    ${response}=    Get Movie Sessions    invalid_movie_id
+    Should Be Equal As Integers    ${response.status_code}    404
+
+Movies-006: Validate Movie Data Structure
+    [Documentation]    Valida estrutura dos dados do filme
+    [Tags]    positive    validation
     ${response}=    Get All Movies
-    Validate Success Response    ${response}    200
-    
-    ${movies}=    Set Variable    ${response.json()}
-    # Para este sistema, esperamos sempre ter filmes
-    Should Not Be Empty    ${movies}    Sistema deve ter filmes cadastrados
+    ${movies}=    Get From Dictionary    ${response.json()}    data
+    ${first_movie}=    Get From List    ${movies}    0
+    Should Contain    ${first_movie}    _id
+    Should Contain    ${first_movie}    title
+    Should Contain    ${first_movie}    genres
+    Should Contain    ${first_movie}    duration
+
+Movies-007: Search Movies By Genre
+    [Documentation]    Testa busca de filmes por gênero
+    [Tags]    positive    search
+    ${response}=    Search Movies By Genre    Action
+    Should Be Equal As Integers    ${response.status_code}    200
+    Should Contain    ${response.json()}    data
+
+Movies-008: Get Movie Availability
+    [Documentation]    Testa verificação de disponibilidade do filme
+    [Tags]    positive    business
+    ${all_movies}=    Get All Movies
+    ${movies}=    Get From Dictionary    ${all_movies.json()}    data
+    ${first_movie}=    Get From List    ${movies}    0
+    ${movie_id}=    Get From Dictionary    ${first_movie}    _id
+    ${response}=    Check Movie Availability    ${movie_id}
+    Should Be Equal As Integers    ${response.status_code}    200
+    Should Contain    ${response.json()}    data

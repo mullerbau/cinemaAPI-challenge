@@ -10,11 +10,15 @@ robot tests/
 ### **Executar apenas testes de API**
 ```bash
 robot tests/api/
+# OU usando tags
+robot --include api tests/
 ```
 
 ### **Executar apenas testes Web**
 ```bash
 robot tests/web/
+# OU usando tags
+robot --include web tests/
 ```
 
 ## 🎯 **Execução por Tags**
@@ -40,15 +44,30 @@ robot --include security tests/
 robot --include validation tests/
 ```
 
+### **Por Tipo de Interface**
+```bash
+# Apenas testes de API
+robot --include api tests/
+
+# Apenas testes Web
+robot --include web tests/
+
+# Combinação: API de autenticação
+robot --include apiANDauth tests/
+
+# Combinação: Web de reservas
+robot --include webANDreservations tests/
+```
+
 ### **Por Módulo**
 ```bash
-# Autenticação
+# Autenticação (API + Web)
 robot --include auth tests/
 
-# Filmes
+# Filmes (API + Web)
 robot --include movies tests/
 
-# Reservas
+# Reservas (API + Web)
 robot --include reservations tests/
 ```
 
@@ -111,11 +130,20 @@ robot -t "*Login com credenciais válidas*" tests/
 # Testes críticos de API
 robot --include apiANDcritical tests/
 
-# Testes de segurança negativos
-robot --include securityANDnegative tests/
+# Testes críticos de Web
+robot --include webANDcritical tests/
 
-# Testes públicos OU de smoke
-robot --include publicORsmoke tests/
+# Smoke tests apenas de API
+robot --include apiANDsmoke tests/
+
+# Testes de segurança (API + Web)
+robot --include security tests/
+
+# Testes negativos de API
+robot --include apiANDnegative tests/
+
+# Testes de validação Web
+robot --include webANDvalidation tests/
 
 # Excluir testes específicos
 robot --exclude edge_case tests/
@@ -200,6 +228,8 @@ robot --include critical --include business_critical -d results/release tests/
 
 | Tag | Descrição | Exemplo |
 |-----|-----------|---------|
+| `api` | Testes de API REST | `robot --include api tests/` |
+| `web` | Testes de interface web | `robot --include web tests/` |
 | `smoke` | Testes básicos essenciais | `robot --include smoke tests/` |
 | `critical` | Testes críticos do negócio | `robot --include critical tests/` |
 | `positive` | Cenários de sucesso | `robot --include positive tests/` |
@@ -213,25 +243,47 @@ robot --include critical --include business_critical -d results/release tests/
 | `jwt` | Testes relacionados a JWT | `robot --include jwt tests/` |
 | `unauthorized` | Testes de não autorização | `robot --include unauthorized tests/` |
 | `edge_case` | Casos extremos | `robot --include edge_case tests/` |
+| `e2e` | Testes end-to-end | `robot --include e2e tests/` |
+| `ui` | Testes de interface | `robot --include ui tests/` |
+| `responsive` | Testes de responsividade | `robot --include responsive tests/` |
 
 ## 🎯 **Comandos Recomendados por Fase**
 
 ### **Desenvolvimento Local**
 ```bash
-robot --include smoke tests/api/
+# Smoke tests de API (mais rápido)
+robot --include apiANDsmoke tests/
+
+# Smoke tests completos (API + Web)
+robot --include smoke tests/
 ```
 
 ### **Teste de Integração**
 ```bash
+# Testes críticos de API
+robot --include apiANDcritical tests/
+
+# Testes críticos completos
 robot --include critical tests/
 ```
 
 ### **Teste de Regressão**
 ```bash
+# Regressão completa
 robot tests/
+
+# Regressão apenas API
+robot --include api tests/
+
+# Regressão apenas Web
+robot --include web tests/
 ```
 
 ### **Validação de Deploy**
 ```bash
+# Validação rápida (API)
+robot --include apiANDsmoke tests/
+
+# Validação completa
 robot --include smoke --include critical tests/
 ```

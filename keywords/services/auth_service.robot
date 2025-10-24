@@ -2,6 +2,7 @@
 Documentation    Service Object para operações de autenticação
 Library          RequestsLibrary
 Library          JSONLibrary
+Resource         ../../variables/config.robot
 
 *** Keywords ***
 Setup Auth Session
