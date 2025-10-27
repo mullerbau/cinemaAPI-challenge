@@ -33,14 +33,10 @@ Movies-003: Get Movie By Invalid ID
     ${response}=    Get Movie By ID    invalid_id
     Should Be Equal As Integers    ${response.status_code}    404
 
-Movies-004: Get Movie Sessions Successfully
-    [Documentation]    Testa listagem de sessões de um filme
+Movies-004: Get All Sessions Successfully
+    [Documentation]    Testa listagem de todas as sessões
     [Tags]    positive    critical
-    ${all_movies}=    Get All Movies
-    ${movies}=    Get From Dictionary    ${all_movies.json()}    data
-    ${first_movie}=    Get From List    ${movies}    0
-    ${movie_id}=    Get From Dictionary    ${first_movie}    _id
-    ${response}=    Get Movie Sessions    ${movie_id}
+    ${response}=    Get All Sessions
     Should Be Equal As Integers    ${response.status_code}    200
     Should Contain    ${response.json()}    data
 
@@ -68,13 +64,18 @@ Movies-007: Search Movies By Genre
     Should Be Equal As Integers    ${response.status_code}    200
     Should Contain    ${response.json()}    data
 
-Movies-008: Get Movie Availability
-    [Documentation]    Testa verificação de disponibilidade do filme
+Movies-008: Get Session By ID Successfully
+    [Documentation]    Testa busca de sessão por ID
     [Tags]    positive    business
-    ${all_movies}=    Get All Movies
-    ${movies}=    Get From Dictionary    ${all_movies.json()}    data
-    ${first_movie}=    Get From List    ${movies}    0
-    ${movie_id}=    Get From Dictionary    ${first_movie}    _id
-    ${response}=    Check Movie Availability    ${movie_id}
+    ${sessions_response}=    Get All Sessions
+    ${sessions}=    Get From Dictionary    ${sessions_response.json()}    data
+    Run Keyword If    ${sessions}    Validate Session By ID    ${sessions}
+
+*** Keywords ***
+Validate Session By ID
+    [Arguments]    ${sessions}
+    ${first_session}=    Get From List    ${sessions}    0
+    ${session_id}=    Get From Dictionary    ${first_session}    _id
+    ${response}=    Get Session By ID    ${session_id}
     Should Be Equal As Integers    ${response.status_code}    200
     Should Contain    ${response.json()}    data

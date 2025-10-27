@@ -8,14 +8,14 @@ Test Tags    api    auth
 Auth-001: Register New User Successfully
     [Documentation]    Testa registro de novo usuário com dados válidos
     [Tags]    positive    smoke    critical
-    Cleanup Test Data
-    ${response}=    Register User    Test User    ${TEST_USER_EMAIL}    ${TEST_USER_PASSWORD}
+    ${unique_email}=    Generate Unique Email
+    ${response}=    Register User    Test User    ${unique_email}    ${TEST_USER_PASSWORD}
     Should Be Equal As Integers    ${response.status_code}    201
     Should Contain    ${response.json()}    data
     ${data}=    Get From Dictionary    ${response.json()}    data
     Should Contain    ${data}    token
     Should Contain    ${data}    email
-    Should Be Equal    ${data}[email]    ${TEST_USER_EMAIL}
+    Should Be Equal    ${data}[email]    ${unique_email}
 
 Auth-002: Login With Valid Credentials
     [Documentation]    Testa login com credenciais válidas
