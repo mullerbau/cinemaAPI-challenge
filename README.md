@@ -1,10 +1,9 @@
 # 🎬 Cinema App - Automação de Testes
 
-## 👨‍💻 **Apresentação Pessoal**
-**Desenvolvido por**: [Seu Nome]  
-**Projeto**: Challenge Final - Automação de Testes  
-**Tecnologia**: Robot Framework + Python  
-**Período**: Dezembro 2024  
+## 👨‍💻 Sobre o Autor
+**Nome:** Eric Bauer  
+**Challenge Final**  
+**Compass UOL**  
 
 Projeto de automação de testes para sistema de reservas de cinema, desenvolvido como challenge final aplicando conhecimentos de testes automatizados, padrões de design e boas práticas de desenvolvimento.
 
@@ -70,9 +69,8 @@ challenge_final-uol/
 
 ### **1. Clone o Repositório**
 ```bash
-git clone [URL_DO_REPOSITORIO]
-cd challenge_final-uol
-```
+# Clonar o repositório
+git clone https://github.com/mullerbau/cinemaAPI-challenge
 
 ### **2. Instale as Dependências Python**
 ```bash
