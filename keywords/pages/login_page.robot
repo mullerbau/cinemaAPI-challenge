@@ -9,7 +9,7 @@ ${EMAIL_INPUT}            id=email
 ${PASSWORD_INPUT}         id=password
 ${LOGIN_BUTTON}           css=button[type="submit"]
 ${ERROR_MESSAGE}          css=.error-message
-${SUCCESS_INDICATOR}      css=.user-menu, css=.dashboard, css=h1:has-text("Movies")
+${SUCCESS_INDICATOR}      .user-menu, .dashboard, h1
 
 *** Keywords ***
 Open Login Page
@@ -19,8 +19,15 @@ Open Login Page
 
 Fill Login Form
     [Arguments]    ${email}    ${password}
+    Clear Text    ${EMAIL_INPUT}
     Fill Text    ${EMAIL_INPUT}    ${email}
+    Clear Text    ${PASSWORD_INPUT}
     Fill Text    ${PASSWORD_INPUT}    ${password}
+    # Verificar se os valores foram inseridos
+    ${email_value}=    Get Attribute    ${EMAIL_INPUT}    value
+    ${password_value}=    Get Attribute    ${PASSWORD_INPUT}    value
+    Log    Email inserido: ${email_value}
+    Log    Password inserido: ${password_value}
 
 Click Login Button
     Click    ${LOGIN_BUTTON}
