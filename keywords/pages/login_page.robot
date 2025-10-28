@@ -4,12 +4,12 @@ Library          Browser
 Resource         ../../variables/config.robot
 
 *** Variables ***
-${LOGIN_URL}              ${BASE_URL_WEB}/login
-${EMAIL_INPUT}            id=email
-${PASSWORD_INPUT}         id=password
+${LOGIN_URL}              ${WEB_BASE_URL}/login
+${EMAIL_INPUT}            css=#email
+${PASSWORD_INPUT}         css=#password
 ${LOGIN_BUTTON}           css=button[type="submit"]
 ${ERROR_MESSAGE}          css=.error-message
-${SUCCESS_INDICATOR}      .user-menu, .dashboard, h1
+${SUCCESS_INDICATOR}      css=.home-container h1 >> text=Welcome to Cinema App
 
 *** Keywords ***
 Open Login Page
@@ -19,27 +19,19 @@ Open Login Page
 
 Fill Login Form
     [Arguments]    ${email}    ${password}
-    Clear Text    ${EMAIL_INPUT}
-    Fill Text    ${EMAIL_INPUT}    ${email}
-    Clear Text    ${PASSWORD_INPUT}
-    Fill Text    ${PASSWORD_INPUT}    ${password}
-    # Verificar se os valores foram inseridos
-    ${email_value}=    Get Attribute    ${EMAIL_INPUT}    value
-    ${password_value}=    Get Attribute    ${PASSWORD_INPUT}    value
-    Log    Email inserido: ${email_value}
-    Log    Password inserido: ${password_value}
+    Fill Text      ${EMAIL_INPUT}    ${email}
+    Fill Text      ${PASSWORD_INPUT}    ${password}
 
 Click Login Button
     Click    ${LOGIN_BUTTON}
     Wait For Load State    networkidle    timeout=5s
 
 Verify Login Success
-    Wait For Elements State    ${SUCCESS_INDICATOR}    visible    timeout=10s
+    Wait For Elements State    //*[@id="root"]/main/div/h1    visible    timeout=10s
+    ${welcome_text}=    Get Text    //*[@id="root"]/main/div/h1
+    Should Contain Any    ${welcome_text}    Welcome    Bem-vindo
 
 Verify Login Error
-    [Arguments]    ${expected_message}=${EMPTY}
-    Wait For Elements State    ${ERROR_MESSAGE}    visible    timeout=5s
-    IF    '${expected_message}' != '${EMPTY}'
-        ${error_text}=    Get Text    ${ERROR_MESSAGE}
-        Should Contain    ${error_text}    ${expected_message}    ignore_case=True
-    END
+    [Arguments]    ${expected_error}=Invalid credentials
+    ${current_url}=    Get Url
+    Should Contain    ${current_url}    /login

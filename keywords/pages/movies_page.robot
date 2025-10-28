@@ -1,36 +1,42 @@
 *** Settings ***
-Documentation    Page Object para página de filmes
-Library          Browser
-Resource         ../../variables/config.robot
-
-*** Variables ***
-${MOVIES_URL}             ${BASE_URL_WEB}/movies
-${MOVIE_CARD}             css=.movie-card
-${MOVIE_TITLE}            css=.movie-title
-${MOVIE_DETAILS_BUTTON}   css=.view-details
-${SEARCH_INPUT}           id=search
-${GENRE_FILTER}           css=.genre-filter
+Resource    ../../variables/config.robot
+Library     Browser
 
 *** Keywords ***
 Open Movies Page
-    New Page    ${MOVIES_URL}
-    Wait For Load State    networkidle    timeout=10s
-    Wait For Elements State    ${MOVIE_CARD}    visible    timeout=10s
+    New Page    ${WEB_BASE_URL}/movies
+
+Verify Movies Page Loaded
+    Wait For Elements State    //*[@id="root"]/main/div/h1    visible    timeout=10s
+    ${title}=    Get Text    //*[@id="root"]/main/div/h1
+    Should Contain Any    ${title}    Movies    Filmes
 
 Verify Movies List Loaded
-    Get Element Count    ${MOVIE_CARD}    >    0
+    Wait For Elements State    css=.movie-card >> nth=0    visible    timeout=10s
+    ${count}=    Get Element Count    css=.movie-card
+    Should Be True    ${count} > 0
 
 Click First Movie
-    Click    ${MOVIE_CARD} >> nth=0
-    Wait For Load State    networkidle    timeout=5s
+    Click    css=.movie-card >> nth=0
+
+Click Movie Details Button
+    Click    //*[@id="root"]/main/div/div[2]/div[1]/div[2]/a
+
+Verify Movie Details Page
+    Wait For Elements State    css=.movie-detail-header    visible    timeout=10s
 
 Search Movie
-    [Arguments]    ${movie_name}
-    Fill Text    ${SEARCH_INPUT}    ${movie_name}
-    Keyboard Key    press    Enter
-    Wait For Load State    networkidle    timeout=5s
+    [Arguments]    ${movie_title}
+    Fill Text    css=input[placeholder="Buscar filmes..."]    ${movie_title}
+    Sleep    1s
 
 Filter By Genre
     [Arguments]    ${genre}
-    Select Options By    ${GENRE_FILTER}    text    ${genre}
-    Wait For Load State    networkidle    timeout=5s
+    Click    css=.genre-filter
+    Sleep    1s
+    Wait For Elements State    css=[value="${genre}"]    visible    timeout=5s
+    Click    css=[value="${genre}"]
+    Sleep    1s
+
+Verify No Results
+    Wait For Elements State    css=.no-results    visible    timeout=5s

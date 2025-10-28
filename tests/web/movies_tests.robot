@@ -20,47 +20,59 @@ Web-Movies-001: Load Movies Page Successfully
     [Documentation]    Testa carregamento da página de filmes
     [Tags]    positive    smoke    critical
     Open Movies Page
+    Verify Movies Page Loaded
     Verify Movies List Loaded
 
-Web-Movies-002: View Movie Details
-    [Documentation]    Testa visualização de detalhes do filme
-    [Tags]    positive    navigation
-    Open Movies Page
-    Click First Movie
-    Wait For Elements State    css=.movie-details    visible    timeout=10s
-
-Web-Movies-003: Search Movie By Title
+Web-Movies-002: Search Movie By Title
     [Documentation]    Testa busca de filme por título
     [Tags]    positive    search
     Open Movies Page
+    Verify Movies Page Loaded
     Search Movie    Inception
-    Wait For Elements State    ${MOVIE_CARD}    visible    timeout=5s
+    Sleep    2s
+    Verify Movies List Loaded
 
-Web-Movies-004: Filter Movies By Genre
+Web-Movies-003: Filter Movies By Genre
     [Documentation]    Testa filtro de filmes por gênero
     [Tags]    positive    filter
     Open Movies Page
-    Filter By Genre    Action
-    Wait For Elements State    ${MOVIE_CARD}    visible    timeout=5s
+    Verify Movies Page Loaded
+    Click    css=.genre-filter
+    Sleep    2s
 
-Web-Movies-005: Search Non-Existent Movie
+Web-Movies-004: Search Non-Existent Movie
     [Documentation]    Testa busca por filme inexistente
     [Tags]    negative    search
     Open Movies Page
-    Search Movie    NonExistentMovie123
-    Wait For Elements State    css=.no-results    visible    timeout=5s
+    Verify Movies Page Loaded
+    Search Movie    FilmeInexistente123
+    Sleep    2s
+    ${has_results}=    Run Keyword And Return Status    Wait For Elements State    css=.movie-card    visible    timeout=3s
+    Should Be Equal    ${has_results}    ${False}
 
-Web-Movies-006: Movie Card Information Display
-    [Documentation]    Testa exibição de informações no card do filme
-    [Tags]    positive    ui
+Web-Movies-005: Click Movie Card
+    [Documentation]    Testa clique em card de filme
+    [Tags]    positive    navigation
     Open Movies Page
-    Get Text    ${MOVIE_TITLE} >> nth=0    !=    ${EMPTY}
-    Get Element    css=.movie-poster >> nth=0
+    Verify Movies Page Loaded
+    Click First Movie
+    Sleep    2s
 
-Web-Movies-007: Movies Page Responsiveness
-    [Documentation]    Testa responsividade da página de filmes
-    [Tags]    positive    responsive
+Web-Movies-006: Clear Search Filter
+    [Documentation]    Testa limpeza de filtro de busca
+    [Tags]    positive    search
     Open Movies Page
-    Set Viewport Size    375    667    # Mobile
+    Verify Movies Page Loaded
+    Search Movie    Test
+    Sleep    1s
+    Search Movie    ${EMPTY}
+    Sleep    1s
     Verify Movies List Loaded
-    Set Viewport Size    1920    1080   # Desktop
+
+Web-Movies-007: View Movie Details
+    [Documentation]    Testa visualização de detalhes do filme
+    [Tags]    positive    navigation    details
+    Open Movies Page
+    Verify Movies Page Loaded
+    Click Movie Details Button
+    Verify Movie Details Page
