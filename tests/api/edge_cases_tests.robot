@@ -65,7 +65,7 @@ Edge-006: Extremely Long Session ID
     Cleanup Test Data
     ${token}=    Get Valid User Token
     ${seats}=    Create Sample Seats List
-    ${long_session_id}=    Set Variable    ${'a' * 1000}
+    ${long_session_id}=    Evaluate    'a' * 1000
     ${response}=    Create Reservation    ${token}    ${long_session_id}    ${seats}
     Should Be True    ${response.status_code} in [400, 404, 414]
 
@@ -73,8 +73,9 @@ Edge-006: Extremely Long Session ID
 Create Large Seats List
     [Arguments]    ${quantity}
     ${seats}=    Create List
-    FOR    ${i}    IN RANGE    1    ${quantity + 1}
-        ${row}=    Set Variable If    ${i} <= 26    ${chr(64 + ${i})}    Z
+    ${quantity_plus_one}=    Evaluate    ${quantity} + 1
+    FOR    ${i}    IN RANGE    1    ${quantity_plus_one}
+        ${row}=    Set Variable If    ${i} <= 26    A    Z
         ${seat}=    Create Dictionary    row=${row}    number=${i}    type=full
         Append To List    ${seats}    ${seat}
     END

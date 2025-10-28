@@ -58,7 +58,8 @@ Extract Token From Response
 Create Specific Seats List
     [Arguments]    ${row}    ${start_number}    ${end_number}
     ${seats}=    Create List
-    FOR    ${i}    IN RANGE    ${start_number}    ${end_number + 1}
+    ${end_plus_one}=    Evaluate    ${end_number} + 1
+    FOR    ${i}    IN RANGE    ${start_number}    ${end_plus_one}
         ${seat}=    Create Dictionary    row=${row}    number=${i}    type=full
         Append To List    ${seats}    ${seat}
     END
