@@ -1,8 +1,23 @@
 *** Settings ***
-Resource    ../../resources/base.robot
-Suite Setup    New Browser    chromium    headless=false
-Suite Teardown    Close Browser
+Resource    ../../variables/config.robot
+Library     Browser
+Library     DateTime
+Suite Setup    Setup Web Suite
+Suite Teardown    Teardown Web Suite
 Test Tags    web    performance
+Test Timeout    60s
+
+*** Variables ***
+${MOVIE_CARD}    css=.movie-card
+${SEARCH_INPUT}    id=search
+
+*** Keywords ***
+Setup Web Suite
+    New Browser    chromium    headless=false
+    Set Browser Timeout    15s
+
+Teardown Web Suite
+    Close Browser
 
 *** Test Cases ***
 Web-Performance-001: Page Load Time

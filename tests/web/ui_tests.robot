@@ -1,8 +1,23 @@
 *** Settings ***
-Resource    ../../resources/base.robot
-Suite Setup    New Browser    chromium    headless=false
-Suite Teardown    Close Browser
+Resource    ../../variables/config.robot
+Library     Browser
+Suite Setup    Setup Web Suite
+Suite Teardown    Teardown Web Suite
 Test Tags    web    ui
+Test Timeout    30s
+
+*** Variables ***
+${MOVIE_CARD}      css=.movie-card
+${EMAIL_INPUT}     id=email
+${PASSWORD_INPUT}  id=password
+
+*** Keywords ***
+Setup Web Suite
+    New Browser    chromium    headless=false
+    Set Browser Timeout    10s
+
+Teardown Web Suite
+    Close Browser
 
 *** Test Cases ***
 Web-UI-001: Responsive Design Mobile

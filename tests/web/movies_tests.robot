@@ -1,9 +1,19 @@
 *** Settings ***
-Resource    ../../resources/base.robot
+Resource    ../../variables/config.robot
 Resource    ../../keywords/pages/movies_page.robot
-Suite Setup    New Browser    chromium    headless=false
-Suite Teardown    Close Browser
+Library     Browser
+Suite Setup    Setup Web Suite
+Suite Teardown    Teardown Web Suite
 Test Tags    web    movies
+Test Timeout    30s
+
+*** Keywords ***
+Setup Web Suite
+    New Browser    chromium    headless=false
+    Set Browser Timeout    10s
+
+Teardown Web Suite
+    Close Browser
 
 *** Test Cases ***
 Web-Movies-001: Load Movies Page Successfully

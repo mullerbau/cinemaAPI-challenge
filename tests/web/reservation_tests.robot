@@ -1,5 +1,6 @@
 *** Settings ***
-Resource    ../../resources/base.robot
+Resource    ../../variables/config.robot
+Library     Browser
 Resource    ../../keywords/pages/login_page.robot
 Resource    ../../keywords/pages/movies_page.robot
 Resource    ../../keywords/pages/reservation_page.robot

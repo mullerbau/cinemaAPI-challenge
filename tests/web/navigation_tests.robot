@@ -1,5 +1,6 @@
 *** Settings ***
-Resource    ../../resources/base.robot
+Resource    ../../variables/config.robot
+Library     Browser
 Suite Setup    New Browser    chromium    headless=false
 Suite Teardown    Close Browser
 Test Tags    web    navigation
