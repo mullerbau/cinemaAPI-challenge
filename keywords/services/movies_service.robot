@@ -51,3 +51,9 @@ Get All Sessions
     [Documentation]    Lista todas as sessões disponíveis
     ${response}=    GET On Session    cinema_api    /sessions    expected_status=any
     RETURN    ${response}
+
+Get Session By ID
+    [Documentation]    Busca sessão por ID
+    [Arguments]    ${session_id}
+    ${response}=    GET On Session    cinema_api    /sessions/${session_id}    expected_status=any
+    RETURN    ${response}
