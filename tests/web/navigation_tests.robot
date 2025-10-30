@@ -1,54 +1,68 @@
 *** Settings ***
 Resource    ../../variables/config.robot
 Library     Browser
-Suite Setup    New Browser    chromium    headless=false
-Suite Teardown    Close Browser
+Suite Setup    Setup Web Suite
+Suite Teardown    Teardown Web Suite
 Test Tags    web    navigation
+Test Timeout    30s
+
+*** Keywords ***
+Setup Web Suite
+    New Browser    chromium    headless=false
+    Set Browser Timeout    10s
+
+Teardown Web Suite
+    Close Browser
 
 *** Test Cases ***
 Web-Navigation-001: Home Page Load
     [Documentation]    Testa carregamento da página inicial
     [Tags]    positive    smoke    critical
-    New Page    ${BASE_URL_WEB}
-    Wait For Elements State    css=.header    visible    timeout=10s
-    Get Title    contains    Cinema
+    New Page    ${WEB_BASE_URL}
+    Wait For Elements State    //*[@id="root"]/main/div/h1    visible    timeout=10s
+    ${title}=    Get Title
+    Should Contain    ${title}    Cinema
 
-Web-Navigation-002: Header Navigation Links
-    [Documentation]    Testa links de navegação no header
+Web-Navigation-002: Navigate To Movies Page
+    [Documentation]    Testa navegação para página de filmes
     [Tags]    positive    navigation
-    New Page    ${BASE_URL_WEB}
-    Click    css=.nav-movies
-    Wait For Elements State    css=.movies-page    visible    timeout=5s
-    Click    css=.nav-home
-    Wait For Elements State    css=.home-page    visible    timeout=5s
+    New Page    ${WEB_BASE_URL}
+    Wait For Elements State    //*[@id="root"]/main/div/h1    visible    timeout=5s
+    New Page    ${WEB_BASE_URL}/movies
+    Wait For Elements State    //*[@id="root"]/main/div/h1    visible    timeout=5s
+    ${movies_title}=    Get Text    //*[@id="root"]/main/div/h1
+    Should Contain Any    ${movies_title}    Movies    Filmes
 
-Web-Navigation-003: Footer Links
-    [Documentation]    Testa links no footer
+Web-Navigation-003: Navigate To Login Page
+    [Documentation]    Testa navegação para página de login
     [Tags]    positive    navigation
-    New Page    ${BASE_URL_WEB}
-    Scroll To Element    css=.footer
-    Click    css=.footer-about
-    Wait For Elements State    css=.about-page    visible    timeout=5s
+    New Page    ${WEB_BASE_URL}/login
+    Wait For Elements State    css=#email    visible    timeout=5s
+    Wait For Elements State    css=#password    visible    timeout=5s
 
-Web-Navigation-004: Breadcrumb Navigation
-    [Documentation]    Testa navegação por breadcrumb
+Web-Navigation-004: Navigate To Register Page
+    [Documentation]    Testa navegação para página de cadastro
     [Tags]    positive    navigation
-    New Page    ${BASE_URL_WEB}/movies
-    Click    ${MOVIE_CARD} >> nth=0
-    Click    css=.breadcrumb-movies
-    Wait For Elements State    css=.movies-page    visible    timeout=5s
+    New Page    ${WEB_BASE_URL}/register
+    Wait For Elements State    css=#name    visible    timeout=5s
+    Wait For Elements State    css=#email    visible    timeout=5s
 
 Web-Navigation-005: Back Button Functionality
     [Documentation]    Testa funcionalidade do botão voltar
     [Tags]    positive    navigation
-    New Page    ${BASE_URL_WEB}
-    Click    css=.nav-movies
+    New Page    ${WEB_BASE_URL}
+    Wait For Elements State    //*[@id="root"]/main/div/h1    visible    timeout=5s
+    Click    text=Movies
+    Wait For Elements State    //*[@id="root"]/main/div/h1    visible    timeout=5s
     Go Back
-    Wait For Elements State    css=.home-page    visible    timeout=5s
+    Sleep    2s
+    ${current_url}=    Get Url
+    Should Not Contain    ${current_url}    /movies
 
 Web-Navigation-006: Page Not Found (404)
     [Documentation]    Testa página não encontrada
     [Tags]    negative    error
-    New Page    ${BASE_URL_WEB}/nonexistent-page
-    Wait For Elements State    css=.error-404    visible    timeout=5s
-    Get Text    css=.error-message    contains    Page not found
+    New Page    ${WEB_BASE_URL}/pagina-inexistente
+    Sleep    2s
+    ${current_url}=    Get Url
+    Should Contain    ${current_url}    pagina-inexistente

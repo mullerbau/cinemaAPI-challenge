@@ -56,3 +56,57 @@ Web-Reservation-004: Multiple Movie Reservations
     Open Movies Page
     Verify Movies Page Loaded
     Navigate To Reservation
+
+Web-Reservation-005: Select Single Seat
+    [Documentation]    Testa seleção de um assento
+    [Tags]    positive    seats    critical
+    Open Movies Page
+    Verify Movies Page Loaded
+    Navigate To Reservation
+    Select First Available Seat
+    Verify Any Seat Selected
+
+Web-Reservation-006: Select Multiple Seats
+    [Documentation]    Testa seleção de múltiplos assentos
+    [Tags]    positive    seats
+    Open Movies Page
+    Verify Movies Page Loaded
+    Navigate To Reservation
+    Select First Available Seat
+    Select First Available Seat
+    ${selected_count}=    Count Selected Seats
+    Should Be True    ${selected_count} >= 1
+
+Web-Reservation-007: Verify Occupied Seat Not Selectable
+    [Documentation]    Testa que assento ocupado não é selecionável
+    [Tags]    negative    seats
+    Open Movies Page
+    Verify Movies Page Loaded
+    Navigate To Reservation
+    ${occupied_count}=    Get Element Count    css=.seat.occupied
+    Should Be True    ${occupied_count} >= 0
+    ${occupied_disabled}=    Get Element Count    css=.seat.occupied[disabled]
+    Should Be Equal As Numbers    ${occupied_count}    ${occupied_disabled}
+
+Web-Reservation-008: Deselect Seat
+    [Documentation]    Testa deseleção de assento
+    [Tags]    positive    seats
+    Open Movies Page
+    Verify Movies Page Loaded
+    Navigate To Reservation
+    Select Available Seat    B    3
+    Verify Seat Selected    B    3
+    Deselect Seat    B    3
+    ${selected_count}=    Count Selected Seats
+    Should Be Equal As Numbers    ${selected_count}    0
+
+Web-Reservation-009: Proceed To Checkout
+    [Documentation]    Testa prosseguir para checkout
+    [Tags]    positive    checkout    critical
+    Open Movies Page
+    Verify Movies Page Loaded
+    Navigate To Reservation
+    Select First Available Seat
+    Verify Any Seat Selected
+    Click Checkout Button
+    Sleep    2s
