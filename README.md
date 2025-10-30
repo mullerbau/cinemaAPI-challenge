@@ -66,9 +66,7 @@ challenge_final-uol/
 │       ├── movies_page.robot
 │       ├── register_page.robot
 │       └── reservation_page.robot
-├── libs/                         # Scripts de suporte
-│   ├── mongodb_cleanup.py        # Limpeza de dados
-│   └── database_keywords.robot   # Keywords de DB
+├── libs/                         # Scripts de suporte (vazio)
 ├── variables/                    # Configurações
 │   └── config.robot             # URLs e credenciais
 ├── resources/                    # Recursos base
@@ -85,7 +83,7 @@ challenge_final-uol/
 - Robot Framework 6.0+
 - RequestsLibrary (API tests)
 - Browser Library - Playwright (Web tests)
-- MongoDB (Database cleanup)
+
 - Git (Controle de versão)
 
 ## ⚙️ Instalação
@@ -154,14 +152,7 @@ robot --include responsive tests/web/      # Responsividade
 robot --include performance tests/web/     # Performance
 ```
 
-### **🧹 Limpeza de Dados**
-```bash
-# Limpar dados de teste do MongoDB
-python libs/mongodb_cleanup.py
 
-# Executar com limpeza automática
-robot --variable CLEANUP:true tests/web/
-```
 
 ## 📊 Relatórios e Logs
 
@@ -180,19 +171,14 @@ robot --variable CLEANUP:true tests/web/
 - **`PRESENTATION_TEMPLATE.md`** - Template para apresentação
 - **`api_issues_report.md`** - Bugs encontrados na API
 
-### **📤 Exportação para Ferramentas**
-```bash
 
-# Exportar para QAlity Plus
-python convert_to_qality_plus.py
-```
 
 ## 📚 Documentação Completa
 
 ### 🎯 **Arquitetura e Padrões**
 - **Service Objects Pattern** - API tests com separação de responsabilidades
 - **Page Objects Pattern** - Web tests com reutilização de componentes
-- **Database Integration** - MongoDB cleanup automático
+
 - **CI/CD Ready** - Estrutura preparada para pipelines
 
 ### 📋 **Documentação Técnica**
@@ -232,7 +218,7 @@ python convert_to_qality_plus.py
 - **Robot Framework** - Framework principal
 - **RequestsLibrary** - Testes de API REST
 - **Browser Library (Playwright)** - Testes web modernos
-- **MongoDB** - Gerenciamento de dados de teste
+
 - **Python** - Scripts de suporte e automação
 - **Git** - Controle de versão com branching strategy
 
