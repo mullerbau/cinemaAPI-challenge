@@ -1,6 +1,7 @@
 *** Settings ***
 Library    RequestsLibrary
 Library    JSONLibrary
+Resource   data_management.robot
 Variables  ../variables/config.robot
 
 *** Keywords ***
@@ -35,21 +36,39 @@ Validar Resposta de Sucesso
     [Arguments]    ${response}    ${expected_status}=200
     Should Be Equal As Strings    ${response.status_code}    ${expected_status}
     Should Not Be Empty    ${response.json()}
+    ${success}=    Get Value From Json    ${response.json()}    $.success
+    Should Be True    ${success[0]}
 
 Validar Resposta de Erro
     [Arguments]    ${response}    ${expected_status}    ${expected_message}=${None}
     Should Be Equal As Strings    ${response.status_code}    ${expected_status}
+    ${success}=    Get Value From Json    ${response.json()}    $.success
+    Should Be Equal    ${success[0]}    ${False}
     IF    '${expected_message}' != '${None}'
         ${error_message}=    Get Value From Json    ${response.json()}    $.message
         Should Contain    ${error_message[0]}    ${expected_message}
     END
 
-Fazer Login Admin
-    [Documentation]    Faz login como administrador
-    ${response}=    Fazer Login Via API    ${ADMIN_EMAIL}    ${ADMIN_PASSWORD}
+Registrar Usuário Via API
+    [Arguments]    ${name}    ${email}    ${password}
+    ${user_data}=    Create Dictionary    name=${name}    email=${email}    password=${password}
+    ${response}=    POST On Session    cinema_api    /auth/register    json=${user_data}
     RETURN    ${response}
 
-Fazer Login Usuario Teste
-    [Documentation]    Faz login como usuário de teste
-    ${response}=    Fazer Login Via API    ${TEST_USER_EMAIL}    ${TEST_USER_PASSWORD}
+Obter Perfil Via API
+    ${response}=    Fazer Requisição Autenticada    GET    /auth/me
+    RETURN    ${response}
+
+Atualizar Perfil Via API
+    [Arguments]    ${data}
+    ${response}=    Fazer Requisição Autenticada    PUT    /auth/profile    ${data}
+    RETURN    ${response}
+
+Listar Filmes Via API
+    ${response}=    GET On Session    cinema_api    /movies
+    RETURN    ${response}
+
+Obter Filme Por ID Via API
+    [Arguments]    ${movie_id}
+    ${response}=    GET On Session    cinema_api    /movies/${movie_id}
     RETURN    ${response}

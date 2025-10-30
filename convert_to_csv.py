@@ -1,0 +1,144 @@
+#!/usr/bin/env python3
+"""
+Script para converter casos de teste do markdown para CSV
+Formato compatível com Jira import
+"""
+
+import csv
+import re
+
+def extract_test_cases():
+    """Extrai todos os casos de teste e converte para lista"""
+    
+    # Dados dos casos de teste
+    test_cases = []
+    
+    # API - Autenticação
+    api_auth = [
+        ["Auth-001", "Register New User Successfully", "Testa registro de novo usuário com dados válidos", "API", "Autenticação", "Positivo", "Alta"],
+        ["Auth-002", "Login With Valid Credentials", "Testa login com credenciais válidas", "API", "Autenticação", "Positivo", "Crítica"],
+        ["Auth-003", "Register User With Existing Email", "Testa registro com email já existente", "API", "Autenticação", "Negativo", "Média"],
+        ["Auth-004", "Login With Invalid Email", "Testa login com email inválido", "API", "Autenticação", "Negativo", "Média"],
+        ["Auth-005", "Login With Invalid Password", "Testa login com senha incorreta", "API", "Autenticação", "Negativo", "Média"],
+        ["Auth-006", "Register With Invalid Email Format", "Testa registro com formato de email inválido", "API", "Autenticação", "Negativo", "Baixa"],
+        ["Auth-007", "Register With Weak Password", "Testa registro com senha fraca", "API", "Autenticação", "Negativo", "Baixa"]
+    ]
+    
+    # API - Filmes
+    api_movies = [
+        ["Movies-001", "Get All Movies Successfully", "Testa listagem de todos os filmes", "API", "Filmes", "Positivo", "Alta"],
+        ["Movies-002", "Get Movie By Valid ID", "Testa busca de filme por ID válido", "API", "Filmes", "Positivo", "Alta"],
+        ["Movies-003", "Get Movie By Invalid ID", "Testa busca de filme com ID inválido", "API", "Filmes", "Negativo", "Média"],
+        ["Movies-004", "Get Movie Sessions Successfully", "Testa listagem de sessões do filme", "API", "Filmes", "Positivo", "Alta"],
+        ["Movies-005", "Get Sessions For Invalid Movie", "Testa busca de sessões para filme inexistente", "API", "Filmes", "Negativo", "Baixa"],
+        ["Movies-006", "Validate Movie Data Structure", "Valida estrutura dos dados do filme", "API", "Filmes", "Positivo", "Média"],
+        ["Movies-007", "Search Movies By Genre", "Testa busca de filmes por gênero", "API", "Filmes", "Positivo", "Média"],
+        ["Movies-008", "Get Movie Availability", "Testa verificação de disponibilidade", "API", "Filmes", "Positivo", "Média"]
+    ]
+    
+    # API - Reservas
+    api_reservations = [
+        ["Reservations-001", "Create Reservation Successfully", "Testa criação de reserva com dados válidos", "API", "Reservas", "Positivo", "Crítica"],
+        ["Reservations-002", "Create Reservation Without Authentication", "Testa criação sem autenticação", "API", "Reservas", "Negativo", "Alta"],
+        ["Reservations-003", "Create Reservation With Invalid Session", "Testa criação com sessão inválida", "API", "Reservas", "Negativo", "Média"],
+        ["Reservations-004", "Create Reservation With Occupied Seats", "Testa criação com assentos ocupados", "API", "Reservas", "Negativo", "Alta"],
+        ["Reservations-005", "Get User Reservations Successfully", "Testa listagem de reservas do usuário", "API", "Reservas", "Positivo", "Alta"],
+        ["Reservations-006", "Get Reservation By ID Successfully", "Testa busca de reserva por ID", "API", "Reservas", "Positivo", "Média"],
+        ["Reservations-007", "Cancel Reservation Successfully", "Testa cancelamento de reserva", "API", "Reservas", "Positivo", "Alta"],
+        ["Reservations-008", "Cancel Non-Existent Reservation", "Testa cancelamento de reserva inexistente", "API", "Reservas", "Negativo", "Baixa"],
+        ["Reservations-009", "Create Reservation With Empty Seats", "Testa criação sem seleção de assentos", "API", "Reservas", "Negativo", "Média"]
+    ]
+    
+    # Web - Login
+    web_login = [
+        ["Web-Login-001", "Login With Valid Credentials", "Testa login com credenciais válidas", "Web", "Login", "Positivo", "Crítica"],
+        ["Web-Login-002", "Login With Invalid Email", "Testa login com email inválido", "Web", "Login", "Negativo", "Média"],
+        ["Web-Login-003", "Login With Invalid Password", "Testa login com senha inválida", "Web", "Login", "Negativo", "Média"],
+        ["Web-Login-004", "Login With Empty Fields", "Testa login com campos vazios", "Web", "Login", "Negativo", "Média"],
+        ["Web-Login-005", "Login Form Validation", "Testa validação de formato de email", "Web", "Login", "Negativo", "Baixa"]
+    ]
+    
+    # Web - Cadastro
+    web_register = [
+        ["Web-Register-001", "Register With Valid Data", "Testa cadastro com dados válidos", "Web", "Cadastro", "Positivo", "Alta"],
+        ["Web-Register-002", "Register With Empty Fields", "Testa cadastro com campos vazios", "Web", "Cadastro", "Negativo", "Média"],
+        ["Web-Register-003", "Register With Password Mismatch", "Testa cadastro com senhas diferentes", "Web", "Cadastro", "Negativo", "Média"],
+        ["Web-Register-004", "Register With Invalid Email Format", "Testa cadastro com email inválido", "Web", "Cadastro", "Negativo", "Baixa"],
+        ["Web-Register-005", "Register With Existing Email", "Testa cadastro com email já existente", "Web", "Cadastro", "Negativo", "Média"]
+    ]
+    
+    # Web - Filmes
+    web_movies = [
+        ["Web-Movies-001", "Load Movies Page Successfully", "Testa carregamento da página de filmes", "Web", "Filmes", "Positivo", "Crítica"],
+        ["Web-Movies-002", "Search Movie By Title", "Testa busca de filme por título", "Web", "Filmes", "Positivo", "Alta"],
+        ["Web-Movies-003", "Filter Movies By Genre", "Testa filtro de filmes por gênero", "Web", "Filmes", "Positivo", "Média"],
+        ["Web-Movies-004", "Search Non-Existent Movie", "Testa busca por filme inexistente", "Web", "Filmes", "Negativo", "Baixa"],
+        ["Web-Movies-005", "Click Movie Card", "Testa clique em card de filme", "Web", "Filmes", "Positivo", "Alta"],
+        ["Web-Movies-006", "Clear Search Filter", "Testa limpeza de filtro de busca", "Web", "Filmes", "Positivo", "Baixa"],
+        ["Web-Movies-007", "View Movie Details", "Testa visualização de detalhes do filme", "Web", "Filmes", "Positivo", "Alta"]
+    ]
+    
+    # Web - Reservas
+    web_reservations = [
+        ["Web-Reservation-001", "Navigate To Reservation Page", "Testa navegação para página de reserva", "Web", "Reservas", "Positivo", "Crítica"],
+        ["Web-Reservation-002", "Access Reservation With Login", "Testa acesso à reserva com login", "Web", "Reservas", "Positivo", "Alta"],
+        ["Web-Reservation-003", "Back Link Navigation", "Testa navegação pelo link voltar", "Web", "Reservas", "Positivo", "Média"],
+        ["Web-Reservation-004", "Multiple Movie Reservations", "Testa navegação para reserva de diferentes filmes", "Web", "Reservas", "Positivo", "Baixa"],
+        ["Web-Reservation-005", "Select Single Seat", "Testa seleção de um assento", "Web", "Reservas", "Positivo", "Crítica"],
+        ["Web-Reservation-006", "Select Multiple Seats", "Testa seleção de múltiplos assentos", "Web", "Reservas", "Positivo", "Alta"],
+        ["Web-Reservation-007", "Verify Occupied Seat Not Selectable", "Testa que assento ocupado não é selecionável", "Web", "Reservas", "Negativo", "Alta"],
+        ["Web-Reservation-008", "Deselect Seat", "Testa desseleção de assento", "Web", "Reservas", "Positivo", "Média"],
+        ["Web-Reservation-009", "Proceed To Checkout", "Testa prosseguir para checkout", "Web", "Reservas", "Positivo", "Alta"]
+    ]
+    
+    # Web - Navegação
+    web_navigation = [
+        ["Web-Navigation-001", "Home Page Load", "Testa carregamento da página inicial", "Web", "Navegação", "Positivo", "Crítica"],
+        ["Web-Navigation-002", "Navigate To Movies Page", "Testa navegação para página de filmes", "Web", "Navegação", "Positivo", "Alta"],
+        ["Web-Navigation-003", "Navigate To Login Page", "Testa navegação para página de login", "Web", "Navegação", "Positivo", "Alta"],
+        ["Web-Navigation-004", "Navigate To Register Page", "Testa navegação para página de cadastro", "Web", "Navegação", "Positivo", "Alta"],
+        ["Web-Navigation-005", "Back Button Functionality", "Testa funcionalidade do botão voltar", "Web", "Navegação", "Positivo", "Média"],
+        ["Web-Navigation-006", "Page Not Found (404)", "Testa página não encontrada", "Web", "Navegação", "Negativo", "Baixa"]
+    ]
+    
+    # Web - Performance
+    web_performance = [
+        ["Web-Performance-001", "Home Page Load Time", "Testa tempo de carregamento da página inicial", "Web", "Performance", "Performance", "Média"],
+        ["Web-Performance-002", "Movies Page Load Performance", "Testa performance de carregamento da lista de filmes", "Web", "Performance", "Performance", "Média"],
+        ["Web-Performance-003", "Search Response Time", "Testa tempo de resposta da busca", "Web", "Performance", "Performance", "Baixa"],
+        ["Web-Performance-004", "Multiple Page Navigation", "Testa performance durante navegação entre páginas", "Web", "Performance", "Performance", "Baixa"]
+    ]
+    
+    # Combinar todos os casos
+    all_cases = (api_auth + api_movies + api_reservations + 
+                web_login + web_register + web_movies + 
+                web_reservations + web_navigation + web_performance)
+    
+    return all_cases
+
+def create_csv():
+    """Cria arquivo CSV com todos os casos de teste"""
+    
+    # Cabeçalho do CSV
+    headers = ["ID", "Nome", "Descrição", "Camada", "Módulo", "Tipo", "Prioridade"]
+    
+    # Obter casos de teste
+    test_cases = extract_test_cases()
+    
+    # Criar arquivo CSV
+    with open('test_cases_jira.csv', 'w', newline='', encoding='utf-8') as csvfile:
+        writer = csv.writer(csvfile)
+        
+        # Escrever cabeçalho
+        writer.writerow(headers)
+        
+        # Escrever casos de teste
+        for case in test_cases:
+            writer.writerow(case)
+    
+    print(f"Arquivo CSV criado com {len(test_cases)} casos de teste!")
+    print("Arquivo: test_cases_jira.csv")
+    print("Pronto para import no Jira!")
+
+if __name__ == "__main__":
+    create_csv()
