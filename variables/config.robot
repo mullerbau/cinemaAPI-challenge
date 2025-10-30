@@ -1,7 +1,7 @@
 *** Variables ***
 # URLs da aplicação
 ${BASE_URL_API}        http://localhost:3000/api/v1
-${BASE_URL_WEB}        http://localhost:5173
+${WEB_BASE_URL}        http://localhost:3002
 
 # Credenciais de teste
 ${VALID_EMAIL}         user@example.com
