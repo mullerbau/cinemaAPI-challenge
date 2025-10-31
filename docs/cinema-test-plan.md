@@ -10,9 +10,9 @@ O objetivo é demonstrar a estratégia de automação aplicada, os cenários efe
 
 ### 1.1 Equipe de Testes
 
-**Testador Responsável:** [Seu Nome]
+**Testador Responsável:** Eric Müller Bauer
 
-**Período de Execução:** [Data Início] - [Data Fim]
+**Período de Execução:** 20/10/2025 - 30/10/2025
 
 **Ambiente API:** http://localhost:3000/api/v1
 
