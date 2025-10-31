@@ -5,6 +5,7 @@ report.html
 output.xml
 *.pyc
 __pycache__/
+playwright-log.txt
 
 # IDE
 .vscode/
@@ -18,3 +19,38 @@ Thumbs.db
 *.egg-info/
 dist/
 build/
+
+# Dados Sensíveis e Configurações Locais
+*.env
+.env.*
+config.local.robot
+credentials.robot
+database.config
+*.key
+*.pem
+*.p12
+*.pfx
+
+# Arquivos Pessoais e Temporários
+DOCUMENTO_APRESENTACAO_LIMPO.txt
+PRESENTATION_TEMPLATE.md
+*.tmp
+*.temp
+*.bak
+*.backup
+
+# Logs e Screenshots Locais
+browser/traces/
+browser/screenshot/
+screenshots/
+traces/
+
+# Arquivos de Debug
+debug_*.robot
+test_*.robot
+*.debug
+
+# Resultados Locais
+resultsApi/
+resultsWeb/
+results_*/
